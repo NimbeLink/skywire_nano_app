@@ -1,0 +1,107 @@
+# The west manifest for the NimbeLink Skywire Nano
+
+manifest:
+    remotes:
+        -   name:           nimbelink
+            url-base:       https://github.com/NimbeLink
+
+        -   name:           nrf_connect_sdk
+            url-base:       https://github.com/NordicPlayground
+
+        -   name:           zephyr_project
+            url-base:       https://github.com/zephyrproject-rtos
+
+        -   name:           armmbed
+            url-base:       https://github.com/ARMmbed
+
+    projects:
+        # Projects for the Skywire Nano
+        -   name:           skywire_nano_sdk
+            remote:         nimbelink
+            repo-path:      skywire_nano_sdk
+            revision:       v0.9.0
+
+        -   name:           skywire_nano_scripts
+            remote:         nimbelink
+            repo-path:      skywire_nano_scripts
+            revision:       master
+            west-commands:  west-commands.yml
+
+        # Projects for the nRF Connect SDK
+        #
+        # Nordic has their own fork of the Zephyr RTOS, which contains a
+        # handful of tweaks.
+        -   name:           nrf
+            remote:         nimbelink
+            repo-path:      fw-nrfconnect-nrf
+            revision:       v1.2.0-nlsdk-rc1
+            west-commands:  scripts/west-commands.yml
+
+        -   name:           mcuboot
+            remote:         nrf_connect_sdk
+            repo-path:      fw-nrfconnect-mcuboot
+            revision:       v1.4.99-ncs2
+
+        -   name:           mcumgr
+            path:           modules/lib/mcumgr
+            remote:         nrf_connect_sdk
+            repo-path:      fw-nrfconnect-mcumgr
+            revision:       v0.0.1-ncs1
+
+        -   name:           nrfxlib
+            path:           nrfxlib
+            remote:         nrf_connect_sdk
+            revision:       v1.2.0
+
+        -   name:           zephyr
+            remote:         nimbelink
+            repo-path:      zephyr
+            revision:       v2.1.99-nlsdk-rc1
+            west-commands:  scripts/west-commands.yml
+
+        # Projects for Zephyr
+        #
+        # Which... doesn't contain Zephyr itself.
+        -   name:           nffs
+            path:           modules/fs/nffs
+            remote:         zephyr_project
+            revision:       bc62a2fa9d98ddb5d633c932ea199bc68e10f194
+
+        -   name:           hal_nordic
+            path:           modules/hal/nordic
+            remote:         zephyr_project
+            revision:       474ad9ab42305c0d18e39183163a69ed2442c02b
+
+        -   name:           segger
+            path:           modules/debug/segger
+            remote:         zephyr_project
+            revision:       6fcf61606d6012d2c44129edc033f59331e268bc
+
+        -   name:           mbedtls
+            path:           modules/crypto/mbedtls
+            remote:         zephyr_project
+            revision:       4f1e8f5a78dc08aa42a47cc1ad059cce558c26c3
+
+        -   name:           tinycbor
+            path:           modules/lib/tinycbor
+            remote:         zephyr_project
+            revision:       0fc68fceacd1efc1ce809c5880c380f3d98b7b6e
+
+        -   name:           ci-tools
+            path:           tools/ci-tools
+            remote:         zephyr_project
+            revision:       c083680dd5e281218ddb47d0ceac5c5fd5619749
+
+        -   name:           net-tools
+            path:           tools/net-tools
+            remote:         zephyr_project
+            revision:       30b7efa827b04d2e47840716b0372737fe7d6c92
+
+        -   name:           mbedtls-nrf
+            path:           mbedtls
+            remote:         armmbed
+            repo-path:      mbedtls
+            revision:       mbedtls-2.16.4
+
+    self:
+        path: app

@@ -1,0 +1,133 @@
+###
+ # \file
+ #
+ # \brief Provides configurations for the Skywire Nano widget examples
+ #
+ # © NimbeLink Corp. 2020
+ #
+ # All rights reserved except as explicitly granted in the license agreement
+ # between NimbeLink Corp. and the designated licensee.  No other use or
+ # disclosure of this software is permitted. Portions of this software may be
+ # subject to third party license terms as specified in this software, and such
+ # portions are excluded from the preceding copyright notice of NimbeLink Corp.
+ ##
+
+menuconfig WIDGET_BLINKY_EXAMPLE
+    bool "Blinky Widget Example"
+    default n
+    help
+        Enables the Blinky Example
+
+if WIDGET_BLINKY_EXAMPLE
+
+    config BLINKY_BLINK_RATE
+        int "Rate at which the blinky's LED will blink, in Hz"
+        default 1
+
+    config BLINKY_GPIO_PIN
+        int "The pin to toggle (2, 3, 4 for blue, orange, green, respectively, by default)"
+        default 4
+
+    config BLINKY_DEBUG
+        bool "Enable debug printing"
+        default n
+endif
+
+menuconfig WIDGET_DASHBOARD_EXAMPLE
+    bool "Dashboard Widget Example"
+    default n
+    help
+        Enables the Dashboard Example
+
+if WIDGET_DASHBOARD_EXAMPLE
+
+    menuconfig WIDGET_CONFIGURATION
+        bool "Dashboard configuration"
+        default y
+
+    if WIDGET_CONFIGURATION
+
+        config DASHBOARD_UPDATE_RATE
+            int "Rate at which to update the current values, in seconds"
+            default 5
+
+        config DASHBOARD_DEBUG
+            bool "Enable debug printing"
+            default n
+
+        config DASHBOARD_X
+            int "Number of windows per row"
+            default 3
+
+        config DASHBOARD_Y
+            int "Number of windows per column"
+            default 3
+
+        config DASHBOARD_W
+            int "Width of the windows"
+            default 20
+
+        config DASHBOARD_H
+            int "Height of the windows"
+            default 5
+
+    endif
+
+    menuconfig WIDGET_ACCEL_EXAMPLE
+        bool "Accel Widget Example"
+            default n
+            help
+                Enables the Accel Example
+
+    if WIDGET_ACCEL_EXAMPLE
+
+        config ACCEL_SAMPLE_RATE
+            int "Rate at which to update the current values, in Hz"
+            default 5
+
+        config ACCEL_DEBUG
+	    bool "Enable debug printing"
+	    default n
+
+	endif
+
+    menuconfig WIDGET_BUTTON_EXAMPLE
+        bool "Button Widget Example"
+            default n
+            help
+                Enables the Button Example
+
+    if WIDGET_BUTTON_EXAMPLE
+
+        config BUTTON_DEBUG
+            bool "Enable debug printing"
+            default n
+
+	endif
+
+    menuconfig WIDGET_CELL_EXAMPLE
+        bool "Cell Status Widget Example"
+            default n
+            help
+                Enables the Cell Status Example
+
+    if WIDGET_CELL_EXAMPLE
+
+        config CELL_POLL_RATE
+            int "Seconds between each poll for cellular status"
+            default 5
+
+        config CELL_CAGE_SIM
+            bool "Sim cage"
+            default y
+                help
+                    Yes if desired sim is in the cage
+
+
+        config CELL_DEBUG
+            bool "Enable debug printing"
+            default n
+
+	endif
+
+endif

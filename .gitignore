@@ -1,0 +1,8 @@
+# Ignore the compiled Python files from our west commands
+*.pyc
+
+# Ignore open vim editors
+*.swp
+
+# Ignore build system stuff
+build/
