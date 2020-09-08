@@ -59,8 +59,8 @@ void main(void)
     {
 
         char resp[100];
-        NimbeLink::Sdk::SecureServices::At::CommandResult result;
-        NimbeLink::Sdk::SecureServices::At::CommandError error;
+        NimbeLink::Sdk::SecureServices::At::Result result;
+        NimbeLink::Sdk::SecureServices::At::Error error;
         int32_t ret = NimbeLink::Sdk::SecureServices::At::RunCommand(&result, &error, std::data(commands[i]), std::size(commands[i]), resp, 100);
 
 	if (ret == 0)

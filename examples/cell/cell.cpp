@@ -97,8 +97,8 @@ void Cell::Rsrpq(void)
     char *rsrq = nullptr;
 
     const char comma[2] = ",";
-    NimbeLink::Sdk::SecureServices::At::CommandResult result;
-    NimbeLink::Sdk::SecureServices::At::CommandError error;
+    NimbeLink::Sdk::SecureServices::At::Result result;
+    NimbeLink::Sdk::SecureServices::At::Error error;
 
     // get the cellular status
     int32_t ret = NimbeLink::Sdk::SecureServices::At::RunCommand(&result, &error, "AT+CESQ", 7, resp, 100);
@@ -153,8 +153,8 @@ void Cell::Carrier(void)
 
     const char quote[2] = "\"";
 
-    NimbeLink::Sdk::SecureServices::At::CommandResult result;
-    NimbeLink::Sdk::SecureServices::At::CommandError error;
+    NimbeLink::Sdk::SecureServices::At::Result result;
+    NimbeLink::Sdk::SecureServices::At::Error error;
 
     // get the MCC MNC codes
     int32_t ret = NimbeLink::Sdk::SecureServices::At::RunCommand(&result, &error, "AT+COPS?", 8, resp, 100);

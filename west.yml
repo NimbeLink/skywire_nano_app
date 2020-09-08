@@ -19,7 +19,7 @@ manifest:
         -   name:           skywire_nano_sdk
             remote:         nimbelink
             repo-path:      skywire_nano_sdk
-            revision:       v0.9.0
+            revision:       v0.9.1
 
         -   name:           skywire_nano_scripts
             remote:         nimbelink
