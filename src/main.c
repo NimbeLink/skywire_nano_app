@@ -114,10 +114,10 @@ static int shadow_update(bool version_number_include)
 		goto cleanup;
 	}
 
-	struct aws_iot_data tx_data = {
+	struct aws_iot_tx_data tx_data = {
 		.qos = MQTT_QOS_0_AT_MOST_ONCE,
 		.topic.type = AWS_IOT_SHADOW_TOPIC_UPDATE,
-		.ptr = message,
+		.str = message,
 		.len = strlen(message)
 	};
 
@@ -166,15 +166,8 @@ static void shadow_update_version_work_fn(struct k_work *work)
 void aws_iot_event_handler(const struct aws_iot_evt *const evt)
 {
 	switch (evt->type) {
-	case AWS_IOT_EVT_CONNECTING:
-		printk("AWS_IOT_EVT_CONNECTING\n");
-		break;
 	case AWS_IOT_EVT_CONNECTED:
 		printk("AWS_IOT_EVT_CONNECTED\n");
-
-		if (evt->data.persistent_session) {
-			printk("Persistent session enabled\n");
-		}
 
 #if defined(CONFIG_BSD_LIBRARY)
 		/** Successfully connected to AWS IoT broker, mark image as
@@ -210,40 +203,11 @@ void aws_iot_event_handler(const struct aws_iot_evt *const evt)
 	case AWS_IOT_EVT_DATA_RECEIVED:
 		printk("AWS_IOT_EVT_DATA_RECEIVED\n");
 		break;
-	case AWS_IOT_EVT_FOTA_START:
-		printk("AWS_IOT_EVT_FOTA_START\n");
-		break;
-	case AWS_IOT_EVT_FOTA_ERASE_PENDING:
-		printk("AWS_IOT_EVT_FOTA_ERASE_PENDING\n");
-		printk("Disconnect LTE link or reboot\n");
-#if defined(CONFIG_BSD_LIBRARY)
-		err = lte_lc_offline();
-		if (err) {
-			printk("Error disconnecting from LTE\n");
-		}
-#endif
-		break;
-	case AWS_IOT_EVT_FOTA_ERASE_DONE:
-		printk("AWS_FOTA_EVT_ERASE_DONE\n");
-		printk("Reconnecting the LTE link");
-#if defined(CONFIG_BSD_LIBRARY)
-		err = lte_lc_connect();
-		if (err) {
-			printk("Error connecting to LTE\n");
-		}
-#endif
-		break;
 	case AWS_IOT_EVT_FOTA_DONE:
 		printk("AWS_IOT_EVT_FOTA_DONE\n");
 		printk("FOTA done, rebooting device\n");
 		aws_iot_disconnect();
 		sys_reboot(0);
-		break;
-	case AWS_IOT_EVT_FOTA_DL_PROGRESS:
-		printk("AWS_IOT_EVT_FOTA_DL_PROGRESS, (%d%%)",
-		       evt->data.fota_progress);
-	case AWS_IOT_EVT_ERROR:
-		printk("AWS_IOT_EVT_ERROR, %d\n", evt->data.err);
 		break;
 	default:
 		printk("Unknown AWS IoT event type: %d\n", evt->type);
