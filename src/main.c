@@ -17,7 +17,6 @@
 #endif
 #include <net/aws_iot.h>
 #include <power/reboot.h>
-#include <date_time.h>
 #include <dfu/mcuboot.h>
 #include <cJSON.h>
 #include <cJSON_os.h>
@@ -27,16 +26,10 @@ BUILD_ASSERT(!IS_ENABLED(CONFIG_LTE_AUTO_INIT_AND_CONNECT),
 
 #define APP_TOPICS_COUNT CONFIG_AWS_IOT_APP_SUBSCRIPTION_LIST_COUNT
 
-/* Timeout in seconds in which the application will wait for an initial event
- * from the date time library.
- */
-#define DATE_TIME_TIMEOUT_S 15
-
 static struct k_delayed_work shadow_update_work;
 static struct k_delayed_work shadow_update_version_work;
 
 K_SEM_DEFINE(lte_connected, 0, 1);
-K_SEM_DEFINE(date_time_obtained, 0, 1);
 
 static int json_add_obj(cJSON *parent, const char *str, cJSON *item)
 {
@@ -73,14 +66,8 @@ static int shadow_update(bool version_number_include)
 {
 	int err;
 	char *message;
-	int64_t message_ts;
+	int64_t message_ts = k_uptime_get();
 	int16_t bat_voltage = 0;
-
-	err = date_time_now(&message_ts);
-	if (err) {
-		printk("date_time_now, error: %d\n", err);
-		return err;
-	}
 
 #if defined(CONFIG_BSD_LIBRARY)
 	/* Request battery voltage data from the modem. */
@@ -395,31 +382,6 @@ static int app_topics_subscribe(void)
 	return err;
 }
 
-static void date_time_event_handler(const struct date_time_evt *evt)
-{
-	switch (evt->type) {
-	case DATE_TIME_OBTAINED_MODEM:
-		printk("DATE_TIME_OBTAINED_MODEM\n");
-		break;
-	case DATE_TIME_OBTAINED_NTP:
-		printk("DATE_TIME_OBTAINED_NTP\n");
-		break;
-	case DATE_TIME_OBTAINED_EXT:
-		printk("DATE_TIME_OBTAINED_EXT\n");
-		break;
-	case DATE_TIME_NOT_OBTAINED:
-		printk("DATE_TIME_NOT_OBTAINED\n");
-		break;
-	default:
-		break;
-	}
-
-	/** Do not depend on obtained time, continue upon any event from the
-	 *  date time library.
-	 */
-	k_sem_give(&date_time_obtained);
-}
-
 void main(void)
 {
 	int err;
@@ -459,15 +421,6 @@ void main(void)
 
 	k_sem_take(&lte_connected, K_FOREVER);
 #endif
-
-
-	date_time_update_async(date_time_event_handler);
-
-	err = k_sem_take(&date_time_obtained, K_SECONDS(DATE_TIME_TIMEOUT_S));
-	if (err) {
-		printk("Date time, no callback event within %d seconds\n",
-			DATE_TIME_TIMEOUT_S);
-	}
 
 	err = aws_iot_connect(NULL);
 	if (err) {
