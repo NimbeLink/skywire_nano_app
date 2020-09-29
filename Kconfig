@@ -12,6 +12,18 @@
  # portions are excluded from the preceding copyright notice of NimbeLink Corp.
  ##
 
+menu "AWS IoT Sample Settings"
+
+config APP_VERSION
+	string "Application version"
+	default "v1.0.0"
+
+config PUBLICATION_INTERVAL_SECONDS
+	int "Interval in seconds that the sample will publish data"
+	default 60
+
+endmenu
+
 # Include the Zephyr kernel's configuration in a separate menu
 menu "Zephyr Kernel"
     source "${ZEPHYR_BASE}/Kconfig.zephyr"
