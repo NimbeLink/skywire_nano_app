@@ -349,6 +349,8 @@ static int app_topics_subscribe(void)
 
 void main(void)
 {
+	printk("Sleeping a bit...\n");
+
 	k_sleep(K_SECONDS(20));
 
 	int err;
@@ -361,11 +363,15 @@ void main(void)
 	bsd_lib_modem_dfu_handler();
 #endif
 
+	printk("Starting AWS IoT library...\n");
+
 	err = aws_iot_init(NULL, aws_iot_event_handler);
 	if (err) {
 		printk("AWS IoT library could not be initialized, error: %d\n",
 		       err);
 	}
+
+	printk("Subscribing topcis...\n");
 
 	/** Subscribe to customizable non-shadow specific topics
 	 *  to AWS IoT backend.
@@ -376,7 +382,10 @@ void main(void)
 			err);
 	}
 
+	printk("Initializing work...\n");
+
 	work_init();
+
 #if defined(CONFIG_BSD_LIBRARY)
 	modem_configure();
 
@@ -389,12 +398,16 @@ void main(void)
 	k_sem_take(&lte_connected, K_FOREVER);
 #endif
 
+	printk("Connecting AWS IoT...\n");
+
 	struct aws_iot_config config;
 
 	err = aws_iot_connect(&config);
 	if (err) {
 		printk("aws_iot_connect failed: %d\n", err);
 	}
+
+	printk("Done!\n");
 
 	struct pollfd fds[] = {
 		{
