@@ -348,6 +348,8 @@ static int app_topics_subscribe(void)
 
 void main(void)
 {
+	k_sleep(K_SECONDS(20));
+
 	int err;
 
 	printk("The AWS IoT sample started, version: %s\n", CONFIG_APP_VERSION);
