@@ -16,6 +16,7 @@
 #include <bsd.h>
 #endif
 #include <net/aws_iot.h>
+#include <net/socket.h>
 #include <power/reboot.h>
 #include <dfu/mcuboot.h>
 #include <cJSON.h>
@@ -388,8 +389,53 @@ void main(void)
 	k_sem_take(&lte_connected, K_FOREVER);
 #endif
 
-	err = aws_iot_connect(NULL);
+	struct aws_iot_config config;
+
+	err = aws_iot_connect(&config);
 	if (err) {
 		printk("aws_iot_connect failed: %d\n", err);
+	}
+
+	struct pollfd fds[] = {
+		{
+			.fd = config.socket,
+			.events = POLLIN
+		}
+	};
+
+	while (true) {
+		err = poll(fds, ARRAY_SIZE(fds), K_SECONDS(CONFIG_MQTT_KEEPALIVE / 3));
+
+		if (err < 0) {
+			printk("poll() returned an error: %d\n", err);
+			continue;
+		}
+
+		if (err == 0) {
+			aws_iot_ping();
+			continue;
+		}
+
+		if ((fds[0].revents & POLLIN) == POLLIN) {
+			aws_iot_input();
+		}
+
+		if ((fds[0].revents & POLLNVAL) == POLLNVAL) {
+			printk("Socket error: POLLNVAL\n");
+			printk("The AWS IoT socket was unexpectedly closed.\n");
+			return;
+		}
+
+		if ((fds[0].revents & POLLHUP) == POLLHUP) {
+			printk("Socket error: POLLHUP\n");
+			printk("Connection was closed by the AWS IoT broker.\n");
+			return;
+		}
+
+		if ((fds[0].revents & POLLERR) == POLLERR) {
+			printk("Socket error: POLLERR\n");
+			printk("AWS IoT broker connection was unexpectedly closed.\n");
+			return;
+		}
 	}
 }
