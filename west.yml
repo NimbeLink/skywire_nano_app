@@ -20,7 +20,7 @@ manifest:
             remote:         nimbelink
             repo-path:      skywire_nano_sdk
             revision:       v0.9.2
-            west-commands:  west-commands.yml
+            west-commands:  scripts/west-commands.yml
 
         # Projects for the nRF Connect SDK
         #

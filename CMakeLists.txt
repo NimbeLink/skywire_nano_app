@@ -17,7 +17,6 @@ cmake_minimum_required(VERSION 3.8.2)
 set(PROJECT_ROOT        "${CMAKE_CURRENT_LIST_DIR}")
 set(REPOSITORY_ROOT     "${PROJECT_ROOT}/..")
 set(NANO_SDK_ROOT       "${REPOSITORY_ROOT}/skywire_nano_sdk/")
-set(SCRIPTS_ROOT        "${REPOSITORY_ROOT}/skywire_nano_scripts/")
 
 ################################################################
 #
@@ -36,6 +35,7 @@ set(ENV{GNUARMEMB_TOOLCHAIN_PATH}   ${REPOSITORY_ROOT}/toolchain)
 ################################################################
 
 # Set up the location of our custom boards
+set(DTS_ROOT        ${NANO_SDK_ROOT})
 set(BOARD_ROOT      ${NANO_SDK_ROOT})
 set(BOARD           skywire_nano_widget)
 
@@ -130,8 +130,7 @@ add_custom_target(
         "${signedAppBin}"
 
     COMMAND
-        python ${SCRIPTS_ROOT}
-        dfu
+        west skywire-dfu
         --firmware-file="${signedAppBin}"
         --firmware-type=2
         --header-size=64
