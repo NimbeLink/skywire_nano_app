@@ -1,7 +1,7 @@
 ###
  # \file
  #
- # \brief Builds the Skywire Nano widget
+ # \brief Builds the Skywire Nano application
  #
  # © NimbeLink Corp. 2020
  #
@@ -37,7 +37,7 @@ set(ENV{GNUARMEMB_TOOLCHAIN_PATH}   ${REPOSITORY_ROOT}/toolchain)
 # Set up the location of our custom boards
 set(DTS_ROOT        ${NANO_SDK_ROOT})
 set(BOARD_ROOT      ${NANO_SDK_ROOT})
-set(BOARD           skywire_nano_widget)
+set(BOARD           skywire_nano_app)
 
 ################################################################
 #
@@ -132,8 +132,6 @@ add_custom_target(
     COMMAND
         west skywire-dfu
         --firmware-file="${signedAppBin}"
-        --firmware-type=2
-        --header-size=64
         --output-file="${signedAppBin}"
 )
 
