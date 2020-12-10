@@ -1,9 +1,10 @@
 /**
  * \file
  *
- * \brief A basic 'blinky' applet
+ * \brief A basic 'blinky' applet that demonstrates communicating with the
+ *        onboard LED
  *
- * © NimbeLink Corp. 2020
+ * (C) NimbeLink Corp. 2020
  *
  * All rights reserved except as explicitly granted in the license agreement
  * between NimbeLink Corp. and the designated licensee.  No other use or
@@ -43,9 +44,10 @@ void Blinky::Handler(void *arg1, void *arg2, void *arg3)
 
     if (blinky == nullptr)
     {
-#	if CONFIG_BLINKY_DEBUG
-	printk("return nullptr blinky handler\n");
-#	endif
+    #   if CONFIG_BLINKY_DEBUG
+        printk("return nullptr blinky handler\n");
+    #   endif
+
         return;
     }
 
@@ -67,9 +69,10 @@ Blinky::Blinky(void)
     // If that didn't work for some reason, don't bother with our thread
     if (this->gpioDevice == nullptr)
     {
-#	if CONFIG_BLINKY_DEBUG
-	printk("return nullptr gpio device\n");
-#	endif
+    #   if CONFIG_BLINKY_DEBUG
+        printk("return nullptr gpio device\n");
+    #   endif
+
         return;
     }
 
@@ -104,7 +107,7 @@ void Blinky::Run(void)
 
         uint32_t currentState;
 
-	// get the current state of the LED
+        // Get the current state of the LED
         int result = gpio_pin_read(
             this->gpioDevice,
             this->GpioPin,
@@ -114,9 +117,10 @@ void Blinky::Run(void)
         // If that failed for some reason, don't try changing state
         if (result != 0)
         {
-#	    if CONFIG_BLINKY_DEBUG
-	    printk("unable to read gpio pin\n");
-#	    endif
+        #   if CONFIG_BLINKY_DEBUG
+            printk("unable to read gpio pin\n");
+        #   endif
+
             continue;
         }
 

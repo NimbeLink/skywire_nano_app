@@ -3,7 +3,7 @@
  #
  # \brief Builds the Skywire Nano application
  #
- # © NimbeLink Corp. 2020
+ # (C) NimbeLink Corp. 2020
  #
  # All rights reserved except as explicitly granted in the license agreement
  # between NimbeLink Corp. and the designated licensee.  No other use or
@@ -124,14 +124,16 @@ add_custom_target(
         --key "${PROJECT_ROOT}/test_sign.pem"
         --header-size ${CONFIG_TEXT_SECTION_OFFSET}
         --align ${CONFIG_DT_FLASH_WRITE_BLOCK_SIZE}
+        --pad
         --slot-size ${CONFIG_FLASH_LOAD_SIZE}
         --version "1.0.0"
         "${unsignedAppBin}"
         "${signedAppBin}"
 
     COMMAND
-        west skywire-dfu
-        --firmware-file="${signedAppBin}"
+        west skywire format
+        --input="${signedAppBin}"
+        --type="application"
         --output-file="${signedAppBin}"
 )
 

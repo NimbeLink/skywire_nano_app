@@ -1,9 +1,15 @@
 /**
  * \file
  *
- * \brief A basic dashboard dial applet
+ * \brief A basic dashboard dial applet that demonstrates communication between
+ *        applications
  *
- * © NimbeLink Corp. 2020
+ *  Displays other application information on the serial console. VT100 codes
+ *  are used to print to the serial console. Find them here:
+ *
+ *      http://ascii-table.com/ansi-escape-sequences-vt-100.php
+ *
+ * (C) NimbeLink Corp. 2020
  *
  * All rights reserved except as explicitly granted in the license agreement
  * between NimbeLink Corp. and the designated licensee.  No other use or
@@ -16,7 +22,6 @@
 #include <cstddef>
 #include <vector>
 
-#include <device.h>
 #include <kernel.h>
 
 #define ESC 0x1B
@@ -29,11 +34,11 @@ namespace NimbeLink::Examples
 class NimbeLink::Examples::Dashboard
 {
     public:
-        // class that represents a portion of the screen
+        // Class that represents a portion of the screen
         class Window
         {
             private:
-                // defines the upper left corner
+                // Defines the upper left corner
                 std::size_t column;
                 std::size_t row;
 
@@ -44,13 +49,25 @@ class NimbeLink::Examples::Dashboard
                 void MoveCursor(std::size_t count);
 
             public:
-		Window(std::size_t c, std::size_t r) : column(c), row(r){};
-                void Setup(void) ;
+                /**
+                 * \brief Creates a new window
+                 *
+                 * \param c
+                 *      The upper-left column
+                 * \param r
+                 *      The upper-left row
+                 */
+                constexpr Window(std::size_t column, std::size_t row):
+                    column(column),
+                    row(row) {}
+
+                void Setup(void);
                 void Print(const char *format, ...);
         };
 
-	// interface class for classes that want to print to the dashboard
-	// must inherit and override the functions below
+        // Interface class for classes that want to print to the dashboard
+        //
+        // Must inherit and override the functions below.
         class Element
         {
             public:
@@ -71,13 +88,17 @@ class NimbeLink::Examples::Dashboard
         // Our thread's ID
         k_tid_t threadId;
 
-	uint8_t size = 0;
-	Element *elements[9] = {0};
+        // Number of objects in the elements array
+        uint8_t size = 0;
+        Element *elements[9] = {0};
 
-	std::size_t windowColumns;
-	std::size_t windowRows;
-	std::size_t windowWidth;
-	std::size_t windowHeight;
+        // Defines the grid of windows
+        //
+        // Ex: 3x3 where each window is 20 characters by 20 characters.
+        std::size_t windowColumns;
+        std::size_t windowRows;
+        std::size_t windowWidth;
+        std::size_t windowHeight;
 
     private:
         static void Handler(void *arg1, void *arg2, void *arg3);
@@ -85,6 +106,12 @@ class NimbeLink::Examples::Dashboard
         void Run(void);
 
     public:
-        Dashboard(std::size_t gridX, std::size_t girdY, std::size_t windowWidth, std::size_t windowHeight);
-	void RegisterElement(Element &element);
+        Dashboard(
+            std::size_t gridX,
+            std::size_t gridY,
+            std::size_t windowWidth,
+            std::size_t windowHeight
+        );
+
+        void RegisterElement(Element &element);
 };

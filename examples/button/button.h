@@ -1,9 +1,10 @@
 /**
  * \file
  *
- * \brief A basic 'button' applet
+ * \brief A basic 'button' applet that demonstrates communicating with the
+ *        button and callbacks
  *
- * © NimbeLink Corp. 2020
+ * (C) NimbeLink Corp. 2020
  *
  * All rights reserved except as explicitly granted in the license agreement
  * between NimbeLink Corp. and the designated licensee.  No other use or
@@ -33,20 +34,29 @@ class NimbeLink::Examples::Button : public Dashboard::Element
         // Our GPIO pin
         static constexpr const std::size_t GpioPin = DT_GPIO_KEYS_BUTTON_0_GPIOS_PIN;
 
-	// number of times the button has been pressed
-	std::atomic<uint8_t> count = 0;
-	static_assert(decltype(count)::is_always_lock_free, "Atomic variable count isn't lock-free!");
+        // Number of times the button has been pressed
+        //
+        // Maximum is 127 presses.
+        std::atomic<uint8_t> count = 0;
+
+        // Assertions to check if the values are actually atomic operations and
+        // not using locks
+        //
+        // Another option is to use normal data types (uint8_t, int, etc.) and
+        // mutexes.
+        static_assert(decltype(count)::is_always_lock_free, "Atomic variable count isn't lock-free!");
 
         // Our GPIO device
         struct device *gpioDevice = nullptr;
 
-	// Our GPIO callback
-	struct gpio_callback gpio_button_cb;
+        // Our GPIO callback
+        struct gpio_callback gpio_button_cb;
 
     private:
-	static void ButtonCallback(struct device *, struct gpio_callback *, uint32_t pins);
+        static void ButtonCallback(struct device *dev, struct gpio_callback *cb, uint32_t pins);
 
     public:
         Button(void);
-	void Display(Dashboard::Window &window) override;
+
+        void Display(Dashboard::Window &window) override;
 };

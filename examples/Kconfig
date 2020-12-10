@@ -3,7 +3,7 @@
  #
  # \brief Provides configurations for the Skywire Nano widget examples
  #
- # © NimbeLink Corp. 2020
+ # (C) NimbeLink Corp. 2020
  #
  # All rights reserved except as explicitly granted in the license agreement
  # between NimbeLink Corp. and the designated licensee.  No other use or
@@ -75,9 +75,11 @@ if WIDGET_DASHBOARD_EXAMPLE
 
     menuconfig WIDGET_ACCEL_EXAMPLE
         bool "Accel Widget Example"
-            default n
-            help
-                Enables the Accel Example
+        default n
+        select I2C
+        select I2C_2
+        help
+            Enables the Accel Example
 
     if WIDGET_ACCEL_EXAMPLE
 
@@ -86,16 +88,16 @@ if WIDGET_DASHBOARD_EXAMPLE
             default 5
 
         config ACCEL_DEBUG
-	    bool "Enable debug printing"
-	    default n
+            bool "Enable debug printing"
+            default n
 
 	endif
 
     menuconfig WIDGET_BUTTON_EXAMPLE
         bool "Button Widget Example"
-            default n
-            help
-                Enables the Button Example
+        default n
+        help
+            Enables the Button Example
 
     if WIDGET_BUTTON_EXAMPLE
 
@@ -107,9 +109,9 @@ if WIDGET_DASHBOARD_EXAMPLE
 
     menuconfig WIDGET_CELL_EXAMPLE
         bool "Cell Status Widget Example"
-            default n
-            help
-                Enables the Cell Status Example
+        default n
+        help
+            Enables the Cell Status Example
 
     if WIDGET_CELL_EXAMPLE
 
@@ -120,9 +122,8 @@ if WIDGET_DASHBOARD_EXAMPLE
         config CELL_CAGE_SIM
             bool "Sim cage"
             default y
-                help
-                    Yes if desired sim is in the cage
-
+            help
+                Yes if desired sim is in the cage
 
         config CELL_DEBUG
             bool "Enable debug printing"
@@ -131,3 +132,58 @@ if WIDGET_DASHBOARD_EXAMPLE
 	endif
 
 endif
+
+menuconfig WIDGET_SOCKET_EXAMPLE
+    bool "Socket Widget Example"
+    default n
+    select NETWORKING
+    select NET_SOCKETS
+    select NET_SOCKETS_OFFLOAD
+    select NET_SOCKETS_POSIX_NAMES
+    select NIMBELINK_SOCKETS
+    select TEST_RANDOM_GENERATOR
+    help
+        Enables the Socket Example
+
+if WIDGET_SOCKET_EXAMPLE
+
+    # Since we can't select a choice above, we'll relist the choice here and
+    # set the default to what we would've selected
+    choice RNG_GENERATOR_CHOICE
+        default TIMER_RANDOM_GENERATOR
+    endchoice
+
+    config SOCKET_POST_RATE
+        int "Rate at which we post to dweet"
+        default 120
+
+    config SOCKET_DEBUG
+        bool "Enable debug printing"
+        default n
+
+    menuconfig WIDGET_CELL_EXAMPLE
+        bool "Cell Status Widget Example"
+        default n
+        help
+            Enables the Cell Status Example
+
+    if WIDGET_CELL_EXAMPLE
+
+        config CELL_POLL_RATE
+            int "Seconds between each poll for cellular status"
+            default 5
+
+        config CELL_CAGE_SIM
+            bool "Sim cage"
+            default y
+            help
+                Yes if desired sim is in the cage
+
+        config CELL_DEBUG
+            bool "Enable debug printing"
+            default n
+
+	endif
+
+endif
+

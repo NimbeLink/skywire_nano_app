@@ -1,9 +1,15 @@
 /**
  * \file
  *
- * \brief A basic dashboard applet
+ * \brief A basic dashboard dial applet that demonstrates communication between
+ *        applications
  *
- * © NimbeLink Corp. 2020
+ *  Displays other application information on the serial console. VT100 codes
+ *  are used to print to the serial console. Find them here:
+ *
+ *      http://ascii-table.com/ansi-escape-sequences-vt-100.php
+ *
+ * (C) NimbeLink Corp. 2020
  *
  * All rights reserved except as explicitly granted in the license agreement
  * between NimbeLink Corp. and the designated licensee.  No other use or
@@ -42,9 +48,10 @@ void Dashboard::Handler(void *arg1, void *arg2, void *arg3)
 
     if (dashboard == nullptr)
     {
-#       if CONFIG_DASHBOARD_DEBUG
-	printk("returning nullptr\n");
-#       endif
+    #   if CONFIG_DASHBOARD_DEBUG
+        printk("returning nullptr\n");
+    #   endif
+
         return;
     }
 
@@ -85,12 +92,29 @@ Dashboard::Dashboard(
     );
 }
 
-void Dashboard::Window::Setup(void) 
+/**
+ * \brief Moves the cursor to the upper left of the window object
+ *
+ * \param none
+ *
+ * \return none
+ */
+void Dashboard::Window::Setup(void)
 {
     printk("%c[%d;%dH", ESC, this->row + 2, this->column + 1);
 }
 
-void Dashboard::Window::Print(const char *format, ...) 
+/**
+ * \brief Takes in a format string and the arguments
+ *
+ * \param format
+ *      The string with typical format characters (%s, %c, %d, ...)
+ * \param ...
+ *      Arguments to sub the format characters with
+ *
+ * \return none
+ */
+void Dashboard::Window::Print(const char *format, ...)
 {
     va_list list;
     va_start(list, format);
@@ -100,17 +124,37 @@ void Dashboard::Window::Print(const char *format, ...)
     va_end(list);
 }
 
+/**
+ * \brief Prints a character to the window by calling the next print function
+ *
+ * \param c
+ *      The ascii code of the character to print
+ * \param context
+ *      The window object the character should be printed to
+ *
+ * \return 0
+ */
 int Dashboard::Window::Print(int c, void *context)
 {
     Window *window = reinterpret_cast<Window *>(context);
     window->Print(c);
+
     return 0;
 }
 
-void Dashboard::Window::Print(int c) 
+/**
+ * \brief Prints a single character
+ *
+ * \param c
+ *      The ascii code of the character to be printed
+ *
+ * \return none
+ */
+void Dashboard::Window::Print(int c)
 {
     printk("%c", c);
 
+    // if a new line was printed, reset back to the start of the window
     switch (c)
     {
         case '\n':
@@ -121,13 +165,22 @@ void Dashboard::Window::Print(int c)
     }
 }
 
-void Dashboard::Window::MoveCursor(std::size_t count) 
+/**
+ * \brief Moves the cursor to the right using VT100 ESC codes
+ *
+ * \param count
+ *      The number of places to move the cursor over
+ *
+ * \return none
+ */
+void Dashboard::Window::MoveCursor(std::size_t count)
 {
     if (count > 1)
     {
         printk("%c[%dC", ESC, count);
     }
 }
+
 /**
  * \brief Runs our dashboard example
  *
@@ -144,22 +197,23 @@ void Dashboard::Run(void)
 
         for (std::size_t i = 0; i < this->size; i++)
         {
-	    std::size_t column = (i % this->windowColumns) * this->windowWidth;
-	    std::size_t row = (i / this->windowColumns) * this->windowHeight;
+            std::size_t column = (i % this->windowColumns) * this->windowWidth;
+            std::size_t row = (i / this->windowRows) * this->windowHeight;
 
-	    Window window(column, row);
+            Window window(column, row);
 
-	    window.Setup();
+            window.Setup();
 
-	    this->elements[i]->Display(window);
+            this->elements[i]->Display(window);
         }
     }
 }
 
 /**
- * \brief Function to register a device with the dashboard handler
+ * \brief Registers a device with the dashboard handler
  *
- * \param element is a reference to the element object
+ * \param element
+ *      The element to register
  *
  * \return none
  */

@@ -1,9 +1,10 @@
 /**
  * \file
  *
- * \brief A basic 'blinky' applet
+ * \brief A basic 'blinky' applet that demonstrates communicating with the
+ *        onboard LED
  *
- * © NimbeLink Corp. 2020
+ * (C) NimbeLink Corp. 2020
  *
  * All rights reserved except as explicitly granted in the license agreement
  * between NimbeLink Corp. and the designated licensee.  No other use or

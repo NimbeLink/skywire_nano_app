@@ -1,9 +1,9 @@
 /**
  * \file
  *
- * \brief A basic 'cell' applet
+ * \brief A basic 'cell' applet demonstrating sending AT commands
  *
- * © NimbeLink Corp. 2020
+ * (C) NimbeLink Corp. 2020
  *
  * All rights reserved except as explicitly granted in the license agreement
  * between NimbeLink Corp. and the designated licensee.  No other use or
@@ -16,7 +16,6 @@
 #include <atomic>
 #include <cstddef>
 
-#include <device.h>
 #include <kernel.h>
 
 #include "examples/utils.h"
@@ -28,16 +27,56 @@ namespace NimbeLink::Examples
     class Cell;
 }
 
-// representation of carriers
-enum class Carrier
+class NimbeLink::Examples::Cell
 {
-    VZW,
-    ATT,
-    TMB,
-};
+    public:
+        /**
+         * \brief Available carriers
+         */
+        enum class Carrier
+        {
+            VZW,
+            ATT,
+            TMB,
+            UKN,
+        };
 
-class NimbeLink::Examples::Cell : public Dashboard::Element
-{
+        /**
+         * \brief Cellular information
+         */
+        struct CellData
+        {
+            std::atomic<uint8_t> rsrp = 0;
+            std::atomic<uint8_t> rsrq = 0;
+            std::atomic<enum Carrier> carrier;
+        };
+
+        /**
+         * \brief Gets the string representing the carrier
+         *
+         * \param carrier
+         *      The carrier whose string to get
+         *
+         * \return const char *
+         *      The string
+         */
+        static const char *GetCarrierString(enum Carrier carrier)
+        {
+            switch (carrier)
+            {
+                case Carrier::VZW:
+                    return "VZW";
+                case Carrier::ATT:
+                    return "ATT";
+                case Carrier::TMB:
+                    return "TMB";
+                case Carrier::UKN:
+                    return "UKN";
+            }
+
+            return "N/A";
+        };
+
     private:
         // Our Zephyr stack
         //
@@ -52,40 +91,39 @@ class NimbeLink::Examples::Cell : public Dashboard::Element
         // Our thread's ID
         k_tid_t threadId;
 
-	// struct to store cell data
-	struct CellData
-	{
-	    std::atomic<uint8_t> rsrp = 0;
-	    std::atomic<uint8_t> rsrq = 0;
-	    std::atomic<enum Carrier> carrier;
-	} data;
+        // Struct to store cell data
+        struct CellData data = {255, 255, Carrier::UKN};
 
-	static_assert(decltype(data.rsrp)::is_always_lock_free, "Atomic variable rsrp isn't lock-free!");
+        // Assertions to check if the values are actually atomic operations and
+        // not using locks
+        //
+        // Another option is to use normal data types (uint8_t, int, etc.) and
+        // mutexes.
+        static_assert(decltype(data.rsrp)::is_always_lock_free, "Atomic variable rsrp isn't lock-free!");
         static_assert(decltype(data.rsrq)::is_always_lock_free, "Atomic variable rsrq isn't lock-free!");
         static_assert(decltype(data.carrier)::is_always_lock_free, "Atomic variable carrier isn't lock-free!");
 
     private:
         static void Handler(void *arg1, void *arg2, void *arg3);
 
-	void Rsrpq(void);
-	void Carrier(void);
+        void Rsrpq(void);
+        void Carrier(void);
 
         void Run(void);
-	static constexpr const char *GetCarrierString(enum Carrier carrier)
-	{
-	    switch (carrier)
-	    {
-		case Carrier::VZW:
-	            return "VZW";
-        	case Carrier::ATT:
-	    	    return "ATT";
-        	case Carrier::TMB:
-	    	    return "TMB";
-    	    }
-    	    return "N/A";
-	}
 
     public:
         Cell(void);
-	void Display(Dashboard::Dashboard::Window &window) override;
+
+        /**
+         * \brief Gets our cell data
+         *
+         * \param none
+         *
+         * \return struct CellData *
+         *      Our cell data
+         */
+        struct CellData *GetStruct(void)
+        {
+            return &this->data;
+        }
 };

@@ -3,7 +3,7 @@
  *
  * \brief A basic widget starting point
  *
- * © NimbeLink Corp. 2020
+ * (C) NimbeLink Corp. 2020
  *
  * All rights reserved except as explicitly granted in the license agreement
  * between NimbeLink Corp. and the designated licensee.  No other use or
@@ -13,9 +13,9 @@
  */
 #include <chrono>
 #include <cstdint>
+#include <cstdlib>
+#include <cstring>
 
-#include <stdlib.h>
-#include <string.h>
 #include <zephyr.h>
 
 #if CONFIG_WIDGET_BLINKY_EXAMPLE
@@ -36,6 +36,16 @@
 
 #if CONFIG_WIDGET_DASHBOARD_EXAMPLE
 #include "examples/dashboard/dashboard.h"
+#if CONFIG_WIDGET_CELL_EXAMPLE
+#include "examples/dashboard/elements/display_cell.h"
+#endif
+#endif
+
+#if CONFIG_WIDGET_SOCKET_EXAMPLE
+#include "examples/socket/socket.h"
+#if CONFIG_WIDGET_CELL_EXAMPLE
+#include "examples/socket/posters/post_cell.h"
+#endif
 #endif
 
 #include "examples/utils.h"
@@ -43,9 +53,12 @@
 #include "nimbelink/sdk/secure_services/at.h"
 #include "nimbelink/sdk/secure_services/kernel.h"
 
+using namespace NimbeLink::Examples;
+using namespace NimbeLink::Sdk;
+
 void main(void)
 {
-#   if CONFIG_CELL_CAGE_SIM
+#   if CONFIG_CELL_CAGE_SIM || CONFIG_WIDGET_SOCKET_EXAMPLE
     // allow the modem to boot up properly before trying to change the sim
     k_sleep(K_SECONDS(20));
 
@@ -59,31 +72,31 @@ void main(void)
     {
 
         char resp[100];
-        NimbeLink::Sdk::SecureServices::At::Result result;
-        NimbeLink::Sdk::SecureServices::At::Error error;
-        int32_t ret = NimbeLink::Sdk::SecureServices::At::RunCommand(&result, &error, std::data(commands[i]), std::size(commands[i]), resp, 100);
+        SecureServices::At::Result result;
+        SecureServices::At::Error error;
+        int32_t ret = SecureServices::At::RunCommand(&result, &error, std::data(commands[i]), std::size(commands[i]), resp, 100, nullptr);
 
-	if (ret == 0)
-	{
+        if (ret == 0)
+        {
             if (result != 0)
             {
-                NimbeLink::Examples::Utils::PrintError(commands[i], result, error);
+                Utils::PrintError(commands[i], result, error);
             }
-	}
+        }
     }
 #   endif
 
 #   if CONFIG_WIDGET_BLINKY_EXAMPLE
-    static NimbeLink::Examples::Blinky blinky;
+    static Blinky blinky;
 #   endif
 
 #   if CONFIG_WIDGET_BUTTON_EXAMPLE
-    static NimbeLink::Examples::Button button;
+    static Button button;
 #   endif
 
 
 #   if CONFIG_WIDGET_ACCEL_EXAMPLE
-    static NimbeLink::Examples::Accel accel;
+    static Accel accel;
 #   endif
 
 #   if CONFIG_WIDGET_CELL_EXAMPLE
@@ -91,15 +104,24 @@ void main(void)
 #   endif
 
 #   if CONFIG_WIDGET_DASHBOARD_EXAMPLE
-    static NimbeLink::Examples::Dashboard dashboard(CONFIG_DASHBOARD_X, CONFIG_DASHBOARD_Y, CONFIG_DASHBOARD_W, CONFIG_DASHBOARD_H);
+    static Dashboard dashboard(CONFIG_DASHBOARD_X, CONFIG_DASHBOARD_Y, CONFIG_DASHBOARD_W, CONFIG_DASHBOARD_H);
 #   if CONFIG_WIDGET_ACCEL_EXAMPLE
     dashboard.RegisterElement(accel);
 #   endif
 #   if CONFIG_WIDGET_CELL_EXAMPLE
-    dashboard.RegisterElement(cell);
+    static CellDisplay display(cell);
+    dashboard.RegisterElement(display);
 #   endif
 #   if CONFIG_WIDGET_BUTTON_EXAMPLE
     dashboard.RegisterElement(button);
+#   endif
+#   endif
+
+#   if CONFIG_WIDGET_SOCKET_EXAMPLE
+    static Socket socket;
+#   if CONFIG_WIDGET_CELL_EXAMPLE
+    static CellPoster poster(cell);
+    socket.RegisterData(poster);
 #   endif
 #   endif
 }
